@@ -61,68 +61,94 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`min-h-screen bg-[#262624] flex flex-col sticky top-0 transition-all duration-200 ${
-        collapsed ? 'w-[64px]' : 'w-[240px]'
+      className={`min-h-screen p-2 flex flex-col shrink-0 transition-all duration-200 ${
+        collapsed ? 'w-[76px]' : 'w-[224px]'
       }`}
-      style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}
+      style={{ background: '#eef2f7' }}
     >
-      {/* Top bar: collapse toggle + logo */}
-      <div className="flex items-center gap-2 px-3 py-4">
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white/10 text-[#c2c0b6] shrink-0"
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <line x1="9" y1="3" x2="9" y2="21" />
-          </svg>
-        </button>
-        {!collapsed && (
-          <span className="text-[15px] font-medium text-[#f5f4ed] tracking-tight">Aksara</span>
-        )}
-      </div>
+      <div
+        className="flex-1 flex flex-col rounded-2xl overflow-hidden"
+        style={{
+          background: '#ffffff',
+          boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          fontFamily: "'Inter', -apple-system, sans-serif",
+        }}
+      >
+        {/* Logo + collapse */}
+        <div className="flex items-center gap-2 px-3 py-4">
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
+            style={{ color: '#94a3b8' }}
+            onMouseEnter={e => e.currentTarget.style.background = '#f1f5f9'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            title={collapsed ? 'Expand' : 'Collapse'}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <line x1="9" y1="3" x2="9" y2="21" />
+            </svg>
+          </button>
+          {!collapsed && (
+            <span style={{ fontSize: '15px', fontWeight: 600, color: '#0f172a', letterSpacing: '-0.3px' }}>
+              Aksara
+            </span>
+          )}
+        </div>
 
-      {/* Menu items */}
-      <div className="flex-1 px-2 mt-2">
-        {!collapsed && (
-          <p className="text-[11px] uppercase tracking-wide text-[#8a8778] px-3 mb-1.5">Menu</p>
-        )}
-        {menuItems.map((item) => {
-          const isActive = pathname === item.href
-          return (
-            <div
-              key={item.href}
-              onClick={() => router.push(item.href)}
-              title={collapsed ? item.label : undefined}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-md mb-0.5 cursor-pointer text-sm transition-colors ${
-                isActive
-                  ? 'bg-[#3a3935] text-[#f5f4ed] font-medium'
-                  : 'text-[#c2c0b6] hover:bg-white/5 hover:text-[#f5f4ed]'
-              } ${collapsed ? 'justify-center' : ''}`}
-            >
-              <span className="shrink-0">{item.icon}</span>
-              {!collapsed && <span>{item.label}</span>}
-            </div>
-          )
-        })}
-      </div>
+        {/* Menu */}
+        <div className="flex-1 px-2">
+          {!collapsed && (
+            <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.06em', color: '#94a3b8', padding: '0 10px', marginBottom: '6px', textTransform: 'uppercase' }}>
+              Menu
+            </p>
+          )}
+          {menuItems.map((item) => {
+            const isActive = pathname === item.href
+            return (
+              <div
+                key={item.href}
+                onClick={() => router.push(item.href)}
+                title={collapsed ? item.label : undefined}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl mb-0.5 cursor-pointer transition-all"
+                style={{
+                  fontSize: '14px',
+                  fontWeight: isActive ? 600 : 400,
+                  color: isActive ? '#2563eb' : '#64748b',
+                  background: isActive ? '#eff6ff' : 'transparent',
+                  justifyContent: collapsed ? 'center' : undefined,
+                }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.color = isActive ? '#2563eb' : '#0f172a' }}
+                onMouseLeave={e => { e.currentTarget.style.background = isActive ? '#eff6ff' : 'transparent'; e.currentTarget.style.color = isActive ? '#2563eb' : '#64748b' }}
+              >
+                <span className="shrink-0">{item.icon}</span>
+                {!collapsed && <span>{item.label}</span>}
+              </div>
+            )
+          })}
+        </div>
 
-      {/* Bottom: logout */}
-      <div className="px-2 pb-3 pt-2 border-t border-white/10">
-        <div
-          onClick={handleLogout}
-          title={collapsed ? 'Logout' : undefined}
-          className={`flex items-center gap-2.5 px-3 py-2 rounded-md cursor-pointer text-sm text-[#c2c0b6] hover:bg-white/5 hover:text-[#f5f4ed] transition-colors ${
-            collapsed ? 'justify-center' : ''
-          }`}
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-          {!collapsed && <span>Logout</span>}
+        {/* Logout */}
+        <div className="px-2 pb-3 pt-2" style={{ borderTop: '1px solid #f1f5f9' }}>
+          <div
+            onClick={handleLogout}
+            title={collapsed ? 'Logout' : undefined}
+            className="flex items-center gap-2.5 px-3 py-2 rounded-xl cursor-pointer transition-all"
+            style={{
+              fontSize: '14px',
+              color: '#94a3b8',
+              justifyContent: collapsed ? 'center' : undefined,
+            }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#fef2f2'; e.currentTarget.style.color = '#ef4444' }}
+            onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#94a3b8' }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            {!collapsed && <span>Logout</span>}
+          </div>
         </div>
       </div>
     </div>
