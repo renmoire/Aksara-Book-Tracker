@@ -1,6 +1,6 @@
 "use client";
 
-import "./BookCard.css";
+import "./bookCard.css";
 
 /**
  * BookCard

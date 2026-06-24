@@ -1,6 +1,6 @@
 "use client";
 
-import "./ShelfRow.css";
+import "./shelfRow.css";
 
 /**
  * ShelfRow

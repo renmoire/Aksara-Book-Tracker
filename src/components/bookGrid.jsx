@@ -1,7 +1,7 @@
 "use client";
 
-import "./BookGrid.css";
-import BookCard from "./BookCard";
+import "./bookGrid.css";
+import BookCard from "./bookCard";
 
 /**
  * BookGrid

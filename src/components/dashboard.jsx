@@ -3,7 +3,7 @@
 import "./dashboard.css";
 import Sidebar from "./sidebar";
 import BookGrid from "./bookGrid";
-import ActivityFeed from "./activityFeed";
+import ActivityFeed from "./toReadPile";
 import ShelfRow from "./shelfRow";
 
 /**

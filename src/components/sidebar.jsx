@@ -1,6 +1,6 @@
 "use client";
 
-import "./Sidebar.css";
+import "./sidebar.css";
 
 const NAV_ITEMS = [
   { key: "overview", label: "Ringkasan", icon: "home" },
