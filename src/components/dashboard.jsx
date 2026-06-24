@@ -1,10 +1,10 @@
 "use client";
 
-import "./Dashboard.css";
-import Sidebar from "./Sidebar";
-import BookGrid from "./BookGrid";
-import ActivityFeed from "./ActivityFeed";
-import ShelfRow from "./ShelfRow";
+import "./dashboard.css";
+import Sidebar from "./sidebar";
+import BookGrid from "./bookGrid";
+import ActivityFeed from "./activityFeed";
+import ShelfRow from "./shelfRow";
 
 /**
  * Dashboard
