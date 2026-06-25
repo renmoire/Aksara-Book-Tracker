@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import Sidebar from '../../components/sidebar'
+import Sidebar from '../../components/layout/sidebar'
 
 export default function SearchPage() {
   const [query, setQuery] = useState('')

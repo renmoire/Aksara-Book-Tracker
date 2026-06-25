@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '../lib/supabase'
-import Sidebar from './sidebar'
+import { supabase } from '../../lib/supabase'
+import Sidebar from '../layout/sidebar'
 import BookGrid from './bookGrid'
 import ShelfRow from './shelfRow'
 import CurrentReadsPanel from './currentReadsPanel'
