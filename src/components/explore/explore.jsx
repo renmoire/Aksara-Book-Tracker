@@ -33,6 +33,7 @@ function ExplorePageInner() {
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
   const [savingId, setSavingId] = useState(null)
+  const [navigatingId, setNavigatingId] = useState(null)
   const [message, setMessage] = useState('')
   const [hasSearched, setHasSearched] = useState(false)
 
@@ -147,6 +148,58 @@ function ExplorePageInner() {
     }
   }
 
+  const handleCardClick = async (item) => {
+    setNavigatingId(item.id)
+    setMessage('')
+
+    const info = item.volumeInfo
+    const title = info.title || 'Tanpa Judul'
+    const author = info.authors ? info.authors.join(', ') : 'Unknown'
+    const coverUrl =
+      info.imageLinks?.thumbnail?.replace('http://', 'https://') ||
+      info.imageLinks?.smallThumbnail?.replace('http://', 'https://') ||
+      null
+    const isbn =
+      info.industryIdentifiers?.find((i) => i.type === 'ISBN_13')?.identifier ||
+      info.industryIdentifiers?.find((i) => i.type === 'ISBN_10')?.identifier ||
+      null
+    const totalPages = info.pageCount || null
+    const genre = info.categories ? info.categories[0] : null
+
+    const { data: existingBooks, error: selectError } = await supabase
+      .from('books')
+      .select('id')
+      .eq('title', title)
+      .limit(1)
+
+    let bookId
+
+    if (!selectError && existingBooks && existingBooks.length > 0) {
+      bookId = existingBooks[0].id
+    } else {
+      const { data: newBook, error: insertError } = await supabase
+        .from('books')
+        .insert({ title, author, cover_url: coverUrl, isbn, total_pages: totalPages, genre })
+        .select()
+        .single()
+
+      if (insertError) {
+        setMessage('Gagal membuka detail buku: ' + insertError.message)
+        setNavigatingId(null)
+        return
+      }
+      bookId = newBook.id
+    }
+
+    if (!bookId) {
+      setMessage('Gagal mendapatkan ID buku.')
+      setNavigatingId(null)
+      return
+    }
+
+    router.push(`/book/${bookId}`)
+  }
+
   return (
     <AppShell>
       <div className="p-8 max-w-5xl mx-auto">
@@ -222,7 +275,8 @@ function ExplorePageInner() {
                 return (
                   <div
                     key={item.id}
-                    className="flex gap-4 p-4 bg-white border border-gray-100 rounded-2xl items-center hover:border-gray-200 transition-colors"
+                    onClick={() => handleCardClick(item)}
+                    className={`flex gap-4 p-4 bg-white border border-gray-100 rounded-2xl items-center hover:border-orange-200 hover:shadow-sm transition-all cursor-pointer ${navigatingId === item.id ? 'opacity-60 pointer-events-none' : ''}`}
                   >
                     {/* Cover */}
                     <div className="w-[48px] h-[70px] rounded-lg overflow-hidden bg-orange-50 shrink-0 flex items-center justify-center">
@@ -257,8 +311,8 @@ function ExplorePageInner() {
                     {/* Add button */}
                     <button
                       type="button"
-                      onClick={() => handleAddBook(item)}
-                      disabled={savingId === item.id}
+                      onClick={(e) => { e.stopPropagation(); handleAddBook(item) }}
+                      disabled={savingId === item.id || navigatingId === item.id}
                       className="flex items-center gap-1.5 px-3.5 py-2 bg-gray-50 text-gray-700 text-[12.5px] font-medium rounded-lg hover:bg-gray-100 disabled:opacity-50 transition-colors whitespace-nowrap shrink-0 border border-gray-200"
                     >
                       {savingId === item.id ? (
