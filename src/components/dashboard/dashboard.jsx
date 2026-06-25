@@ -10,12 +10,6 @@ import ShelfRow from './shelfRow'
 import CurrentReadsPanel from './currentReadsPanel'
 import FeaturedCarousel from './featuredCarousel'
 
-const DUMMY_POPULAR = [
-  { id: 'f1', title: 'Laut Bercerita', author: 'Leila S. Chudori', coverUrl: null, rating: 5 },
-  { id: 'f2', title: 'Pulang', author: 'Leila S. Chudori', coverUrl: null, rating: 4 },
-  { id: 'f3', title: 'Bumi Manusia', author: 'Pramoedya A.T.', coverUrl: null, rating: 5 },
-]
-
 export default function Dashboard() {
   const router = useRouter()
 
@@ -25,6 +19,7 @@ export default function Dashboard() {
   const [toReadPile, setToReadPile] = useState([])
   const [recommended, setRecommended] = useState([])
   const [shelves, setShelves] = useState([])
+  const [ratedBooks, setRatedBooks] = useState([])
   const [loading, setLoading] = useState(true)
   const [busyBookId, setBusyBookId] = useState(null)
   const [homeQuery, setHomeQuery] = useState('')
@@ -98,8 +93,33 @@ export default function Dashboard() {
     }))
     setShelves(shelvesData)
 
+    await loadRatedBooks(userData.user.id)
     await loadRecommendations(allUserBooks)
     setLoading(false)
+  }
+
+  async function loadRatedBooks(userId) {
+    const { data: reviewRows } = await supabase
+      .from('reviews')
+      .select('*, books(id, title, author, cover_url)')
+      .eq('user_id', userId)
+      .order('rating', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(8)
+
+    const mapped = (reviewRows || [])
+      .filter((r) => r.books)
+      .map((r) => ({
+        id: r.id,
+        bookId: r.book_id,
+        title: r.books.title,
+        author: r.books.author,
+        coverUrl: r.books.cover_url,
+        rating: r.rating,
+        reviewText: r.review_text || null,
+      }))
+
+    setRatedBooks(mapped)
   }
 
   async function loadRecommendations(allUserBooks) {
@@ -192,7 +212,7 @@ export default function Dashboard() {
           <p className="text-gray-400 text-sm">Memuat data...</p>
         ) : (
           <>
-            <FeaturedCarousel title="Popular" books={DUMMY_POPULAR} />
+            <FeaturedCarousel title="Buku Favoritmu" books={ratedBooks} onBookClick={handleOpenBook} />
 
             <div className="flex gap-6 items-start">
               <div className="flex-1 min-w-0">

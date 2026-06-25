@@ -19,7 +19,7 @@ export default function MyReviewForm({ bookId, userId, existingReview, onSaved }
     const { data, error: err } = await upsertReview({ bookId, userId, rating, reviewText })
     setSaving(false)
 
-    if (err) { setError('Gagal menyimpan review.'); return }
+    if (err) { setError(err.message || 'Gagal menyimpan review.'); return }
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
     onSaved?.(data)
