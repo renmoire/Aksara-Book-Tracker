@@ -1,61 +1,50 @@
-"use client";
+'use client'
 
-import "./bookCard.css";
+import BookCard from './bookCard'
 
 /**
- * BookCard
+ * BookGrid
  * --------
- * Satu kartu buku. Dipakai di rak "Sedang Dibaca" dan grid "Rekomendasi".
- *
  * props:
- * - book: { title, author, coverUrl, progress (0-100, optional), rating (0-5, optional) }
- * - variant: "wide" (untuk rak sedang dibaca, ada progress bar)
- *           | "grid"  (untuk grid rekomendasi, ada rating bintang)
- * - onClick
+ * - title: judul section, misal "Sedang Dibaca"
+ * - books: array book object (lihat BookCard)
+ * - layout: "scroll-wide" (rak sedang dibaca, horizontal scroll, card wide)
+ *          | "grid"        (rekomendasi, grid kolom, card grid)
+ * - onSeeAll, onBookClick
  */
-export default function BookCard({ book, variant = "grid", onClick }) {
-  const { title, author, coverUrl, progress, rating } = book;
-
+export default function BookGrid({ title, books = [], layout = 'grid', onSeeAll, onBookClick }) {
   return (
-    <button
-      type="button"
-      className={`aksara-bookcard aksara-bookcard--${variant}`}
-      onClick={() => onClick?.(book)}
-    >
-      <div className="aksara-bookcard__cover">
-        {coverUrl ? (
-          <img src={coverUrl} alt={title} />
-        ) : (
-          <span className="aksara-bookcard__cover-fallback">{title?.charAt(0)}</span>
+    <section>
+      <div className="flex items-baseline justify-between mb-3.5">
+        <h2 className="text-[19px] font-serif text-gray-900">{title}</h2>
+        {onSeeAll && (
+          <button
+            type="button"
+            onClick={onSeeAll}
+            className="text-[12.5px] font-semibold text-orange-600 hover:underline"
+          >
+            Lihat semua
+          </button>
         )}
       </div>
 
-      <div className="aksara-bookcard__info">
-        <p className="aksara-bookcard__title">{title}</p>
-        <p className="aksara-bookcard__author">{author}</p>
-
-        {variant === "wide" && typeof progress === "number" && (
-          <div className="aksara-bookcard__progress">
-            <div className="aksara-bookcard__progress-bar">
-              <div
-                className="aksara-bookcard__progress-fill"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <span className="aksara-bookcard__progress-label">{progress}%</span>
-          </div>
-        )}
-
-        {variant === "grid" && typeof rating === "number" && (
-          <div className="aksara-bookcard__rating" aria-label={`Rating ${rating} dari 5`}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <span key={i} className={i < rating ? "is-filled" : ""}>
-                ★
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-    </button>
-  );
+      {books.length === 0 ? (
+        <p className="text-[13px] text-gray-400 text-center py-4 border border-dashed border-gray-200 rounded-2xl">
+          Belum ada buku di sini.
+        </p>
+      ) : layout === 'scroll-wide' ? (
+        <div className="flex gap-3 overflow-x-auto pb-1">
+          {books.map((book) => (
+            <BookCard key={book.id} book={book} variant="wide" onClick={onBookClick} />
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-x-4 gap-y-4.5" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))' }}>
+          {books.map((book) => (
+            <BookCard key={book.id} book={book} variant="grid" onClick={onBookClick} />
+          ))}
+        </div>
+      )}
+    </section>
+  )
 }
