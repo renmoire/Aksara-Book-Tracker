@@ -18,17 +18,19 @@ export default function AppShell({ children }) {
         return
       }
 
+      // Ambil profile — kolom yang ada mungkin berbeda tiap project,
+      // pakai fallback supaya tidak crash kalau kolom tidak ada
       const { data: profile } = await supabase
         .from('profiles')
-        .select('name, books_this_year')
+        .select('*')
         .eq('id', authUser.id)
         .single()
 
       setUser({
         id: authUser.id,
         email: authUser.email,
-        name: profile?.name || authUser.email?.split('@')[0] || 'Pembaca',
-        booksThisYear: profile?.books_this_year ?? 0,
+        name: profile?.name || profile?.full_name || profile?.username || authUser.email?.split('@')[0] || 'Pembaca',
+        booksThisYear: profile?.books_this_year ?? profile?.booksthisyear ?? 0,
       })
       setLoading(false)
     }
