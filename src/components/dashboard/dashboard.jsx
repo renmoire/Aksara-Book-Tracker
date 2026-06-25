@@ -27,6 +27,7 @@ export default function Dashboard() {
   const [shelves, setShelves] = useState([])
   const [loading, setLoading] = useState(true)
   const [busyBookId, setBusyBookId] = useState(null)
+  const [homeQuery, setHomeQuery] = useState('')
 
   useEffect(() => {
     loadDashboard()
@@ -145,6 +146,12 @@ export default function Dashboard() {
     }
   }
 
+  function handleHomeSearch(e) {
+    e.preventDefault()
+    if (!homeQuery.trim()) return
+    router.push(`/explore?q=${encodeURIComponent(homeQuery)}`)
+  }
+
   const firstName = user?.email ? user.email.split('@')[0] : 'Pembaca'
 
   return (
@@ -159,16 +166,18 @@ export default function Dashboard() {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3.5 py-2 w-[260px] text-gray-400">
+            <form onSubmit={handleHomeSearch} className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3.5 py-2 w-[260px] text-gray-400 focus-within:border-orange-400 transition-colors">
               <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14ZM21 21l-4.3-4.3" />
               </svg>
               <input
                 type="text"
+                value={homeQuery}
+                onChange={(e) => setHomeQuery(e.target.value)}
                 placeholder="Cari buku, penulis..."
                 className="border-none outline-none bg-transparent text-[13px] text-gray-900 w-full placeholder:text-gray-400"
               />
-            </div>
+            </form>
             <div className="w-9 h-9 rounded-full bg-[#1a2332] text-[#f3f0ea] flex items-center justify-center text-sm font-semibold shrink-0 overflow-hidden border border-gray-200">
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt={firstName} className="w-full h-full object-cover" />
