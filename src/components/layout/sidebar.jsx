@@ -73,7 +73,7 @@ export default function Sidebar({ user }) {
       </div>
 
       {/* User */}
-      <div className="flex items-center gap-2.5 px-2 py-2.5 rounded-xl bg-white/5">
+      {/* <div className="flex items-center gap-2.5 px-2 py-2.5 rounded-xl bg-white/5">
         <div className="w-9 h-9 rounded-full bg-white/10 text-[#f3f0ea] flex items-center justify-center text-sm font-semibold shrink-0 overflow-hidden">
           {user?.avatarUrl ? (
             <img src={user.avatarUrl} alt={user?.name} className="w-full h-full object-cover" />
@@ -85,7 +85,7 @@ export default function Sidebar({ user }) {
           <p className="text-[13px] font-semibold text-[#f3f0ea] truncate">{user?.name ?? 'rendevmail'}</p>
           <p className="text-[11.5px] text-[#9aa3b5] truncate">{user?.booksThisYear ?? 0} buku tahun ini</p>
         </div>
-      </div>
+      </div> */}
 
       {/* Nav */}
       <nav className="flex flex-col gap-0.5">

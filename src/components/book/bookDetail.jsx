@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/src/lib/supabase'
 import { logReadingProgress, getJournalEntries } from '@/src/lib/readingHistory'
+import { updateBookStatus, BOOK_STATUS } from '@/src/lib/userBooks'
 import { getBookReviews, getMyReview } from '@/src/lib/reviews'
 import { getJournalNotes } from '@/src/lib/journalNotes'
 import AppShell from '../layout/appShell'
@@ -91,6 +92,20 @@ export default function BookDetail({ bookId }) {
       previousPage: userBook.current_page || 0,
     })
     if (error) { setMessage('Gagal menyimpan progress: ' + error.message); return }
+
+    const totalPages = book.total_pages || 0
+    const reachedEnd = totalPages > 0 && newPage >= totalPages
+
+    if (reachedEnd && userBook.status !== BOOK_STATUS.FINISHED) {
+      const { error: statusError } = await updateBookStatus(userBook.id, BOOK_STATUS.FINISHED)
+      if (!statusError) {
+        setMessage('Selesai! Buku ini otomatis ditandai sebagai sudah dibaca 🎉')
+        setTimeout(() => setMessage(''), 3500)
+        await loadData()
+        return
+      }
+    }
+
     setMessage('Progress diperbarui!')
     setTimeout(() => setMessage(''), 2500)
     await loadData()

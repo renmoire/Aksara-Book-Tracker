@@ -6,7 +6,7 @@ import { supabase } from './supabase'
 export const BOOK_STATUS = {
   WANT_TO_READ: 'want_to_read',
   CURRENT_READING: 'current_reading',
-  FINISHED: 'finished',
+  FINISHED: 'completed',
 }
 
 export const STATUS_LABEL = {

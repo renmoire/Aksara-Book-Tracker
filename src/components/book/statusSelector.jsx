@@ -21,7 +21,7 @@ export default function StatusSelector({ userBookId, currentStatus, onStatusChan
     const { error: err } = await updateBookStatus(userBookId, newStatus)
     setSaving(false)
 
-    if (err) { setError('Gagal mengubah status.'); return }
+    if (err) { setError(err.message || 'Gagal mengubah status.'); return }
     onStatusChanged?.(newStatus)
   }
 

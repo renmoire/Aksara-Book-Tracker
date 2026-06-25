@@ -49,18 +49,20 @@ export default function BookGrid({
 
   return (
     <section>
-      <div className="flex items-baseline justify-between mb-3.5">
-        <h2 className="text-[19px] font-serif text-gray-900">{title}</h2>
-        {showButton && (
-          <button
-            type="button"
-            onClick={handleSeeAll}
-            className="text-[12.5px] font-semibold text-orange-600 hover:underline"
-          >
-            Lihat semua
-          </button>
-        )}
-      </div>
+      {(title || showButton) && (
+        <div className="flex items-baseline justify-between mb-3.5">
+          {title && <h2 className="text-[19px] font-serif text-gray-900">{title}</h2>}
+          {showButton && (
+            <button
+              type="button"
+              onClick={handleSeeAll}
+              className="text-[12.5px] font-semibold text-orange-600 hover:underline"
+            >
+              Lihat semua
+            </button>
+          )}
+        </div>
+      )}
 
       {books.length === 0 ? (
         <p className="text-[13px] text-gray-400 text-center py-4 border border-dashed border-gray-200 rounded-2xl">

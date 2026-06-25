@@ -50,7 +50,7 @@ function deriveStats(finishedBooks, allUserBooks, readingHistory, year) {
     .map(([name, count]) => ({ name, count, pct: Math.round((count / booksFinished) * 100) }))
 
   // Status breakdown
-  const statusCount = { want_to_read: 0, current_reading: 0, finished: 0 }
+  const statusCount = { want_to_read: 0, current_reading: 0, completed: 0 }
   allUserBooks.forEach((ub) => { if (statusCount[ub.status] !== undefined) statusCount[ub.status]++ })
 
   // Longest reading streak (hari berturut-turut dengan aktivitas)
@@ -182,7 +182,7 @@ function StatusBreakdown({ statusCount }) {
   if (total === 0) return null
 
   const items = [
-    { label: 'Selesai',       key: 'finished',        color: 'bg-[#1a2332]' },
+    { label: 'Selesai',       key: 'completed',       color: 'bg-[#1a2332]' },
     { label: 'Sedang dibaca', key: 'current_reading',  color: 'bg-orange-400' },
     { label: 'Mau dibaca',    key: 'want_to_read',     color: 'bg-gray-200' },
   ]

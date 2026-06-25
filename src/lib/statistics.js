@@ -18,7 +18,7 @@ export async function getStatistics(userId, year) {
       .from('user_books')
       .select('*, books(title, author, cover_url, total_pages, genre)')
       .eq('user_id', userId)
-      .eq('status', 'finished')
+      .eq('status', 'completed')
       .gte('finished_at', yearStart)
       .lte('finished_at', yearEnd)
       .order('finished_at', { ascending: false }),
