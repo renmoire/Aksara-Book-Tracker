@@ -21,7 +21,7 @@ export default function SearchPage() {
 
     try {
       const res = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=12&printType=books`
+        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=12&printType=books${process.env.NEXT_PUBLIC_GOOGLE_BOOKS_API_KEY ? '&key=' + process.env.NEXT_PUBLIC_GOOGLE_BOOKS_API_KEY : ''}`
       )
       const data = await res.json()
       setResults(data.items || [])

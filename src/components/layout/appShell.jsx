@@ -12,27 +12,36 @@ export default function AppShell({ children }) {
 
   useEffect(() => {
     async function init() {
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      if (!authUser) {
-        router.push('/login')
-        return
+      try {
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        if (!authUser) {
+          router.push('/login')
+          return
+        }
+
+        // maybeSingle() tidak error kalau row tidak ada (hindari 406)
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', authUser.id)
+          .maybeSingle()
+
+        setUser({
+          id: authUser.id,
+          email: authUser.email,
+          name:
+            profile?.name ||
+            profile?.full_name ||
+            profile?.username ||
+            authUser.email?.split('@')[0] ||
+            'Pembaca',
+          booksThisYear: profile?.books_this_year ?? profile?.booksthisyear ?? 0,
+        })
+      } catch (err) {
+        console.error('AppShell init error:', err)
+      } finally {
+        setLoading(false)
       }
-
-      // Ambil profile — kolom yang ada mungkin berbeda tiap project,
-      // pakai fallback supaya tidak crash kalau kolom tidak ada
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', authUser.id)
-        .single()
-
-      setUser({
-        id: authUser.id,
-        email: authUser.email,
-        name: profile?.name || profile?.full_name || profile?.username || authUser.email?.split('@')[0] || 'Pembaca',
-        booksThisYear: profile?.books_this_year ?? profile?.booksthisyear ?? 0,
-      })
-      setLoading(false)
     }
     init()
   }, [router])
