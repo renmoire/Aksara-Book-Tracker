@@ -13,7 +13,7 @@ export default function FeaturedCarousel({ title = 'Rilis Terbaru', books = [] }
   return (
     <section>
       <div className="flex items-baseline justify-between mb-3.5">
-        <h2 className="text-[19px] font-serif text-gray-900">{title}</h2>
+        <h2 className="text-[19px] font-serif text-gray-900 font-medium">{title}</h2>
       </div>
 
       <div className="flex gap-4 overflow-x-auto pb-1">

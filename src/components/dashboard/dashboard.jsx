@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/src/lib/supabase'
+import { updateBookStatus, removeFromLibrary } from '@/src/lib/userBooks'
 import AppShell from '../layout/appShell'
 import BookGrid from './bookGrid'
 import ShelfRow from './shelfRow'
@@ -25,6 +26,7 @@ export default function Dashboard() {
   const [recommended, setRecommended] = useState([])
   const [shelves, setShelves] = useState([])
   const [loading, setLoading] = useState(true)
+  const [busyBookId, setBusyBookId] = useState(null)
 
   useEffect(() => {
     loadDashboard()
@@ -56,11 +58,13 @@ export default function Dashboard() {
       .filter((b) => b.status === 'current_reading')
       .map((b) => ({
         id: b.id,
+        bookId: b.book_id,
         title: b.books?.title,
         author: b.books?.author,
         coverUrl: b.books?.cover_url,
         currentPage: b.current_page || 0,
         totalPages: b.books?.total_pages || 0,
+        status: b.status,
       }))
     setCurrentReads(reading)
 
@@ -68,9 +72,11 @@ export default function Dashboard() {
       .filter((b) => b.status === 'want_to_read')
       .map((b) => ({
         id: b.id,
+        bookId: b.book_id,
         title: b.books?.title,
         author: b.books?.author,
         coverUrl: b.books?.cover_url,
+        status: b.status,
       }))
     setToReadPile(wantToRead)
 
@@ -117,6 +123,28 @@ export default function Dashboard() {
     setRecommended(filtered)
   }
 
+  function handleOpenBook(book) {
+    if (book.bookId) router.push(`/book/${book.bookId}`)
+  }
+
+  async function handleChangeStatus(book, newStatus) {
+    setBusyBookId(book.id)
+    const { error } = await updateBookStatus(book.id, newStatus)
+    setBusyBookId(null)
+    if (!error) {
+      await loadDashboard()
+    }
+  }
+
+  async function handleRemove(book) {
+    setBusyBookId(book.id)
+    const { error } = await removeFromLibrary(book.id)
+    setBusyBookId(null)
+    if (!error) {
+      await loadDashboard()
+    }
+  }
+
   const firstName = user?.email ? user.email.split('@')[0] : 'Pembaca'
 
   return (
@@ -130,15 +158,24 @@ export default function Dashboard() {
               {loading ? '…' : firstName}
             </h1>
           </div>
-          <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3.5 py-2 w-[260px] text-gray-400">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
-              <path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14ZM21 21l-4.3-4.3" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Cari buku, penulis..."
-              className="border-none outline-none bg-transparent text-[13px] text-gray-900 w-full placeholder:text-gray-400"
-            />
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3.5 py-2 w-[260px] text-gray-400">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14ZM21 21l-4.3-4.3" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Cari buku, penulis..."
+                className="border-none outline-none bg-transparent text-[13px] text-gray-900 w-full placeholder:text-gray-400"
+              />
+            </div>
+            <div className="w-9 h-9 rounded-full bg-[#1a2332] text-[#f3f0ea] flex items-center justify-center text-sm font-semibold shrink-0 overflow-hidden border border-gray-200">
+              {profile?.avatar_url ? (
+                <img src={profile.avatar_url} alt={firstName} className="w-full h-full object-cover" />
+              ) : (
+                <span className="capitalize">{firstName.charAt(0)}</span>
+              )}
+            </div>
           </div>
         </header>
 
@@ -154,10 +191,23 @@ export default function Dashboard() {
                   title="To Read Pile"
                   books={toReadPile}
                   layout="grid"
+                  limit={6}
                   onSeeAll={() => router.push('/library')}
+                  onBookClick={handleOpenBook}
+                  showStatus
+                  onChangeStatus={handleChangeStatus}
+                  onRemove={handleRemove}
+                  busyBookId={busyBookId}
                 />
               </div>
-              <CurrentReadsPanel books={currentReads} onSeeAll={() => router.push('/library')} />
+              <CurrentReadsPanel
+                books={currentReads}
+                onSeeAll={() => router.push('/library')}
+                onBookClick={handleOpenBook}
+                onChangeStatus={handleChangeStatus}
+                onRemove={handleRemove}
+                busyBookId={busyBookId}
+              />
             </div>
 
             <BookGrid

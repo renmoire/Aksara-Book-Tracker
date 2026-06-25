@@ -1,13 +1,18 @@
 'use client'
 
+import StatusDropdown from './statusDropdown'
+
 /**
  * CurrentReadsPanel
  * ------------------
  * Panel kanan dashboard, daftar buku yang sedang dibaca dengan progress detail.
  * props:
- * - books: [{ id, title, author, coverUrl, currentPage, totalPages }]
+ * - books: [{ id, title, author, coverUrl, currentPage, totalPages, status }]
+ * - onChangeStatus: (book, newStatus) => void
+ * - onRemove: (book) => void
+ * - busyBookId: id user_books yang sedang diproses (disable dropdown-nya)
  */
-export default function CurrentReadsPanel({ books = [], onSeeAll }) {
+export default function CurrentReadsPanel({ books = [], onSeeAll, onBookClick, onChangeStatus, onRemove, busyBookId }) {
   return (
     <aside className="w-[280px] shrink-0 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm h-fit flex flex-col gap-2">
       <div className="flex items-baseline justify-between mb-2">
@@ -24,7 +29,14 @@ export default function CurrentReadsPanel({ books = [], onSeeAll }) {
       ) : (
         <div className="flex flex-col gap-3.5">
           {books.map((book) => (
-            <CurrentReadCard key={book.id} book={book} />
+            <CurrentReadCard
+              key={book.id}
+              book={book}
+              onClick={onBookClick}
+              onChangeStatus={onChangeStatus}
+              onRemove={onRemove}
+              busy={busyBookId === book.id}
+            />
           ))}
         </div>
       )}
@@ -32,32 +44,48 @@ export default function CurrentReadsPanel({ books = [], onSeeAll }) {
   )
 }
 
-function CurrentReadCard({ book }) {
-  const { title, author, coverUrl, currentPage = 0, totalPages = 0 } = book
+function CurrentReadCard({ book, onClick, onChangeStatus, onRemove, busy }) {
+  const { title, author, coverUrl, currentPage = 0, totalPages = 0, status } = book
   const percent = totalPages > 0 ? Math.min(100, Math.round((currentPage / totalPages) * 100)) : 0
 
   return (
     <div className="flex gap-3 pb-3.5 border-b border-gray-100 last:border-b-0 last:pb-0">
-      <div className="w-[44px] h-[64px] rounded-md bg-orange-50 overflow-hidden shrink-0 flex items-center justify-center">
-        {coverUrl ? (
-          <img src={coverUrl} alt={title} className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-sm font-serif text-orange-700">{title?.charAt(0)}</span>
-        )}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-semibold text-gray-900 truncate">{title}</p>
-        <p className="text-[11.5px] text-gray-500 truncate mb-1.5">{author}</p>
-        <div className="flex items-center gap-2">
-          <div className="flex-1 h-1.5 rounded-full bg-gray-100 overflow-hidden">
-            <div className="h-full bg-orange-500 rounded-full" style={{ width: `${percent}%` }} />
-          </div>
-          <span className="text-[11px] text-gray-500 shrink-0">{percent}%</span>
+      <button
+        type="button"
+        onClick={() => onClick?.(book)}
+        className="flex gap-3 flex-1 min-w-0 text-left"
+      >
+        <div className="w-[44px] h-[64px] rounded-md bg-orange-50 overflow-hidden shrink-0 flex items-center justify-center">
+          {coverUrl ? (
+            <img src={coverUrl} alt={title} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-sm font-serif text-orange-700">{title?.charAt(0)}</span>
+          )}
         </div>
-        <p className="text-[11px] text-gray-400 mt-1">
-          Hal. {currentPage} dari {totalPages || '?'}
-        </p>
-      </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-[13px] font-semibold text-gray-900 truncate">{title}</p>
+          <p className="text-[11.5px] text-gray-500 truncate mb-1.5">{author}</p>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+              <div className="h-full bg-orange-500 rounded-full" style={{ width: `${percent}%` }} />
+            </div>
+            <span className="text-[11px] text-gray-500 shrink-0">{percent}%</span>
+          </div>
+          <p className="text-[11px] text-gray-400 mt-1">
+            Hal. {currentPage} dari {totalPages || '?'}
+          </p>
+        </div>
+      </button>
+      {status && (
+        <div className="shrink-0 self-start">
+          <StatusDropdown
+            status={status}
+            busy={busy}
+            onChangeStatus={(s) => onChangeStatus?.(book, s)}
+            onRemove={() => onRemove?.(book)}
+          />
+        </div>
+      )}
     </div>
   )
 }
